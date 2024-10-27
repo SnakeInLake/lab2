@@ -161,8 +161,8 @@ int main() {
             break; 
         }
     }
-
-        cout << "Возможно" << endl; 
+    if (possible){
+            cout << "Возможно" << endl; 
     } else {
         cout << "Невозможно" << endl;
     }
