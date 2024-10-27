@@ -1,14 +1,13 @@
 #pragma once
 
 #include <iostream>
-#include <stdexcept>
 using namespace std;
 
 // Структура узла очереди
 template <typename T>
 struct QueueNode {
-    T data;               // Данные узла (тип T)
-    QueueNode* next;      // Указатель на следующий узел
+    T data;
+    QueueNode* next;
 };
 
 // Структура для очереди
@@ -37,12 +36,14 @@ struct Queue {
         if (front == nullptr) {
             front = rear;
         }
+
+        cout << "Элемент " << value << " добавлен в очередь." << endl;
     }
 
     // Удаление элемента из очереди (dequeue)
     void dequeue() {
         if (front == nullptr) {
-            cout << "Очередь пуста." << endl;
+            cerr << "Ошибка: Очередь пуста." << endl;
             return;
         }
 
@@ -53,12 +54,15 @@ struct Queue {
         if (front == nullptr) {
             rear = nullptr;
         }
+
+        cout << "Элемент удален из очереди." << endl;
     }
 
     // Получение элемента из начала очереди (front) без удаления
     T peek() const {
         if (front == nullptr) {
-            throw runtime_error("Очередь пуста.");
+            cerr << "Ошибка: Очередь пуста." << endl;
+            return T();  // Возвращаем значение по умолчанию для типа T
         }
         return front->data;
     }
