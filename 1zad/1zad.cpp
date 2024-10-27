@@ -75,7 +75,9 @@ Stack copyStack(const Stack& original) {
 }
 
 bool canCompleteTasks(Stack taskStack, string dep1, string dep2) {
-    Stack tempStack = copyStack(taskStack); // Глубокая копия для поиска dep2
+    Stack tempStack = copyStack(taskStack);
+
+    // Проверяем, существует ли dep2 в стеке задач
     bool foundDep2 = false;
     while (tempStack.top != nullptr) {
         if (tempStack.top->data == dep2) {
@@ -84,28 +86,24 @@ bool canCompleteTasks(Stack taskStack, string dep1, string dep2) {
         }
         tempStack.pop();
     }
-    if (!foundDep2) return false;
+    if (!foundDep2) return false; // Если dep2 не найден, задачи выполнить невозможно
 
-    tempStack = copyStack(taskStack); // Глубокая копия для проверки порядка
+    // Проверяем, что dep2 не встречается раньше dep1 в стеке
+    tempStack = copyStack(taskStack); 
+    bool foundDep1 = false;
     while (tempStack.top != nullptr) {
-        if (tempStack.top->data == dep1) break;
-        if (tempStack.top->data == dep2) return false;
-        tempStack.pop();
-    }
-    if (tempStack.top == nullptr) return false;
-
-    // Создаем новый стек без dep1
-    Stack newTaskStack;
-    newTaskStack.init();
-    tempStack = copyStack(taskStack); // Глубокая копия для создания нового стека
-    while (tempStack.top != nullptr) {
-        if (tempStack.top->data != dep1) {
-            newTaskStack.push(tempStack.top->data);
+        if (tempStack.top->data == dep1) {
+            foundDep1 = true;
+            break; 
+        }
+        if (tempStack.top->data == dep2) {
+            return false; // dep2 встречается раньше dep1, задачи выполнить невозможно
         }
         tempStack.pop();
     }
-    taskStack = newTaskStack; // Заменяем старый стек новым
-    return true;
+    if (!foundDep1) return false; // Если dep1 не найден, задачи выполнить невозможно
+
+    return true; // Если все проверки пройдены, задачи выполнить возможно
 }
 
 int main() {
@@ -145,46 +143,55 @@ int main() {
     }
 
     // Парсинг зависимостей
-    stringstream ss_dep(dependenciesPart);
-    string dep1, dep2;
+   stringstream ss_dep(dependenciesPart);
+string dep1, dep2;
 
-    ss_dep >> word; // Считываем "зависимости"
-    ss_dep >> word; // Считываем "="
-    ss_dep.ignore(); // Игнорируем '['
+ss_dep >> word; // Считываем "зависимости"
+ss_dep >> word; // Считываем "="
+ss_dep.ignore(); // Игнорируем '['
 
-    while (ss_dep >> c) {
-        if (isalnum(c)) {
-            dep1 += c;
-        } else if (c == ',') {
-            ss_dep.ignore(); 
-            ss_dep >> c; // Считываем '('
-            ss_dep >> dep2;
-            ss_dep.ignore(); // Игнорируем ')'
+bool possible = true; // Флаг для отслеживания возможности выполнения
 
-            cout << "Зависимость: " << dep1 << " " << dep2 << endl;
-
-            // Проверка зависимости
-            if (!canCompleteTasks(taskStack, dep1, dep2)) {
-                cout << "Невозможно" << endl;
-                return 0;
-            }
-
-            dep1 = "";
-            dep2 = "";
-            if (ss_dep.peek() == ']') break;
-
-            while (ss_dep.peek() == ' ') { // Пропускаем пробелы
-            ss_dep.ignore();
+while (ss_dep >> c) {
+    if (isalnum(c)) {
+        dep1 += c;
+    } else if (c == ',') {
+        ss_dep.ignore(); 
+        ss_dep >> c; 
+        dep2 = ""; 
+        while (ss_dep >> c && c != '\'') {
+            dep2 += c;
         }
-        ss_dep.ignore(3); // Игнорируем ', (' 
+        ss_dep.ignore(); 
+
+        cout << "Зависимость: " << dep1 << " " << dep2 << endl;
+
+        // Проверка зависимости
+        if (!canCompleteTasks(taskStack, dep1, dep2)) {
+            possible = false; // Если зависимость не выполнима, устанавливаем флаг в false
+
+        }
+
+        dep1 = "";
         
-        while (ss_dep.peek() == ' ') { // Пропускаем пробелы
-            ss_dep.ignore();
-        }
+        if (ss_dep.peek() == ']') break; 
+
+        while (ss_dep.peek() == ' ') ss_dep.ignore(); 
+        ss_dep.ignore(3);
+    } else if (c == ']') {
+        break; 
     }
-
-    cout << "Возможно" << endl;
-
-    return 0;
+    else if (isalnum(c)) {  
+        dep2 += c; // Если следующий символ - буква, добавляем ее к dep1
+    }
 }
+
+// Вывод результата на основе флага possible
+if (possible) {
+    cout << "Возможно" << endl;
+} else {
+    cout << "Невозможно" << endl;
+}
+
+return 0;
 }
