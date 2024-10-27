@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "HashTable.h" // Подключаем вашу хэш-таблицу
+#include "HashTable.h" 
 #include <string.h>
 
 using namespace std;
@@ -23,7 +23,7 @@ bool setContains(const string& value) {
 }
 
 void setPrint() {
-    printTable(); // Выводит всю таблицу, можно адаптировать для вывода только ключей
+    printTable(); 
 }
 
 void setLoadFromFile(const string& fileName) {
